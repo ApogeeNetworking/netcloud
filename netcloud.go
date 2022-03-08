@@ -3,6 +3,7 @@ package netcloud
 import (
 	"crypto/tls"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -62,7 +63,20 @@ func (c *Client) makeRequest(req *http.Request) (*http.Response, error) {
 // GetRouter ...
 func (c *Client) GetRouter(r RouterReqParams) ([]Router, error) {
 	var rtrReq RouterReq
-	req, err := c.generateReq("/routers?limit=349", "GET", nil)
+	endpoint := "/routers?limit=349"
+	if r.ID != "" {
+		endpoint += fmt.Sprintf("&id=%s", r.ID)
+	}
+	if r.Ipv4Addr != "" {
+		endpoint += fmt.Sprintf("&id=%s", r.Ipv4Addr)
+	}
+	if r.MacAddr != "" {
+		endpoint += fmt.Sprintf("&id=%s", r.MacAddr)
+	}
+	if r.Name != "" {
+		endpoint += fmt.Sprintf("&id=%s", r.Name)
+	}
+	req, err := c.generateReq(endpoint, "GET", nil)
 	if err != nil {
 		return rtrReq.Data, err
 	}
@@ -71,8 +85,6 @@ func (c *Client) GetRouter(r RouterReqParams) ([]Router, error) {
 		return rtrReq.Data, err
 	}
 	defer res.Body.Close()
-	// d, _ := json.Marshal(res.Body)
-	// fmt.Println(string(d))
 	if err = json.NewDecoder(res.Body).Decode(&rtrReq); err != nil {
 		return rtrReq.Data, err
 	}
